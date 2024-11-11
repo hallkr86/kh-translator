@@ -1,0 +1,7 @@
+body {
+    background-image: url(translateapp.png);
+    height: 500px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
