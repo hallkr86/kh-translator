@@ -1,0 +1,30 @@
+.App {
+  text-align: center;
+  background-image: url("/translateapp.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 40vmin;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  color: black;
+}
+
+.form {
+  background-color: antiquewhite;
+  border-radius: 30px;
+  opacity: 85%;
+}
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
