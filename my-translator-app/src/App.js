@@ -49,7 +49,7 @@ function App() {
 
   const payload = { contents: chatHistory };
   const apiKey = "";
-  const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod';
+  const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
 
   try {
     const response = await fetch(apiUrl, {
