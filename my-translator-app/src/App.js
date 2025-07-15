@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './App.css';
 
 // Main App component for the translator application
 function App() {
@@ -81,21 +82,21 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 sm:p-6 font-inter">
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-200">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-gray-800 mb-8">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700">
+    <div className="App">
+      <div className="form">
+        <h1 className="title">
+          <span>
             Universal Translator
           </span>
         </h1>
 
         <div className="mb-6">
-          <label htmlFor="inputText" className="block text-sm font-medium text-gray-700 mb-2">
-            Enter Text:
+          <label htmlFor="inputText" className="textLabel">
+            Enter Text: 
           </label>
           <textarea
             id="inputText"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out resize-y min-h-[120px] text-gray-800"
+            className="textBox"
             placeholder="Type or paste text here..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -106,7 +107,7 @@ function App() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
             <label htmlFor="sourceLanguage" className="block text-sm font-medium text-gray-700 mb-2">
-              Source Language:
+              Source Language: 
             </label>
             <select
               id="sourceLanguage"
@@ -123,7 +124,7 @@ function App() {
           </div>
           <div>
             <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 mb-2">
-              Target Language:
+              Target Language: 
             </label>
             <select
               id="targetLanguage"
@@ -167,7 +168,7 @@ function App() {
         {translatedText && (
           <div className="mt-6">
             <label htmlFor="translatedText" className="block text-sm font-medium text-gray-700 mb-2">
-              Translated Text:
+              Translated Text: 
             </label>
             <textarea
               id="translatedText"
