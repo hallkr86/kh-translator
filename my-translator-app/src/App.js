@@ -1,16 +1,13 @@
-import React, { useState,useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
-// Main App component
+// Main App component for the translator application
 function App() {
-  // State variables for managing form inputs and output
   const [inputText, setInputText] = useState('');
-  const [sourceLanguage, setSourceLanguage] = useState('en'); // Default source language
-  const [targetLanguage, setTargetLanguage] = useState('es'); // Default target language
   const [translatedText, setTranslatedText] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [sourceLanguage, setSourceLanguage] = useState('en');
+  const [targetLanguage, setTargetLanguage] = useState('es');
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -29,127 +26,111 @@ function App() {
 
   const handleTranslate = async () => {
     setError('');
-    setIsLoading(true); // Set loading state to true
-    setTranslatedText(''); // Clear previous translation
+    setIsLoading(true);
+    setTranslatedText('');
 
     if (!inputText.trim()) {
-      setError('Please Enter Text to Translate.');
+      setError('Please enter text to translate.');
       setIsLoading(false);
       return;
     }
 
-   const prompt = `Translate the following text from ${
-    languages.find(lang => lang.code === sourceLanguage)?.name || sourceLanguage
-  } to ${
-    languages.find(lang => lang.code === targetLanguage)?.name || targetLanguage
-  } :\n\n"${inputText}"`;
+    try {
+      // --- IMPORTANT CHANGE START ---
+      // This is the URL of your AWS API Gateway endpoint
+      // Make sure this matches your deployed API Gateway URL exactly
+      const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
 
-  let chatHistory = [];
-  chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+      // This is the payload your AWS Lambda function expects
+      const payload = {
+        text: inputText,
+        sourceLanguage: sourceLanguage,
+        targetLanguage: targetLanguage,
+      };
 
-  try {
-    const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any other headers your API Gateway or Lambda might expect (e.g., API Key if configured)
+        },
+        body: JSON.stringify(payload) // Convert the payload object to a JSON string
+      });
 
-    const payload = {
-      text: inputText,
-      sourceLanguage: sourceLanguage,
-      targetLanguage: targetLanguage,
-    };
+      // Check if the HTTP response was successful (status code 2xx)
+      if (!response.ok) {
+        const errorData = await response.json(); // Try to parse error message from response body
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+      }
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+      const result = await response.json(); // Parse the JSON response from your Lambda
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (result.translatedText) {
+        setTranslatedText(result.translatedText); // Set the translated text from your Lambda's response
+      } else {
+        setError('Translation failed: Unexpected response format from service.');
+      }
+      // --- IMPORTANT CHANGE END ---
+
+    } catch (err) {
+      console.error('Translation error:', err);
+      setError(`An error occurred during translation: ${err.message || err}. Please try again.`);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const result = await response.json();
-
-    if (result.candidates && result.candidates.length > 0 &&
-        result.candidates[0].content && result.candidates[0].content.parts &&
-        result.candidates[0].content.parts.length > 0) {
-      const text = result.candidates[0].content.parts[0].text;
-      setTranslatedText(text);
-    } else {
-      setError('Translation failed: No valid response from the translation service.');
-    }
-  } catch (err) {
-    console.error('Translation error:', err);
-    setError('An error occurred during translation. Please try again.');
-  } finally {
-    setIsLoading(false);
-  }
-}
-
-
-
-  
-
-   return (
-    // The outermost `div` sets up the overall layout and background for the app.
-    // Tailwind CSS classes are used for styling (e.g., `min-h-screen`, `bg-gradient-to-br`).
-    <div className="App">
-      {/* The main container for the translator's content. */}
-      <div className="form">
-        {/* Application Title */}
-        <h1 className="title">
-          <span>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 sm:p-6 font-inter">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-200">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-gray-800 mb-8">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700">
             Universal Translator
           </span>
         </h1>
 
-        {/* Input Section: Where the user types text to be translated */}
         <div className="mb-6">
-          <label htmlFor="inputText" className="textLabel">
+          <label htmlFor="inputText" className="block text-sm font-medium text-gray-700 mb-2">
             Enter Text:
           </label>
           <textarea
-            id="inputText" // Unique ID for accessibility (linking label to input)
-            className="textBox"
+            id="inputText"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out resize-y min-h-[120px] text-gray-800"
             placeholder="Type or paste text here..."
-            value={inputText} // The value of the textarea is controlled by our `inputText` state.
-            onChange={(e) => setInputText(e.target.value)} // When the user types, update the `inputText` state.
-                                                           // `e.target.value` gets the current text in the textarea.
-            rows="6" // Sets the initial height of the textarea.
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            rows="6"
           ></textarea>
         </div>
 
-        {/* Language Selection Section: Dropdowns for choosing source and target languages */}
-        <div className="dropDowns">
-          {/* Source Language Dropdown */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
-            <label htmlFor="sourceLanguage" className="sourceLanguageLabel">
+            <label htmlFor="sourceLanguage" className="block text-sm font-medium text-gray-700 mb-2">
               Source Language:
             </label>
             <select
               id="sourceLanguage"
-              className="sourceLanguageDropdown"
-              value={sourceLanguage} // The selected value is controlled by our `sourceLanguage` state.
-              onChange={(e) => setSourceLanguage(e.target.value)} // When a new language is selected, update the state.
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out bg-white text-gray-800"
+              value={sourceLanguage}
+              onChange={(e) => setSourceLanguage(e.target.value)}
             >
-              {/* Dynamically render options from the `languages` array */}
               {languages.map((lang) => (
-                <option key={lang.code} value={lang.code}> {/* `key` is important for React to efficiently update lists */}
+                <option key={lang.code} value={lang.code}>
                   {lang.name}
                 </option>
               ))}
             </select>
           </div>
-          {/* Target Language Dropdown */}
           <div>
-            <label htmlFor="targetLanguage" className="targetLanguageLabel">
+            <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 mb-2">
               Target Language:
             </label>
             <select
               id="targetLanguage"
-              className="targetLanguageDropdown"
-              value={targetLanguage} // The selected value is controlled by our `targetLanguage` state.
-              onChange={(e) => setTargetLanguage(e.target.value)} // When a new language is selected, update the state.
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out bg-white text-gray-800"
+              value={targetLanguage}
+              onChange={(e) => setTargetLanguage(e.target.value)}
             >
-              {/* Dynamically render options from the `languages` array */}
               {languages.map((lang) => (
                 <option key={lang.code} value={lang.code}>
                   {lang.name}
@@ -159,16 +140,13 @@ function App() {
           </div>
         </div>
 
-        {/* Translate Button */}
         <button
-          onClick={handleTranslate} // When this button is clicked, call the `handleTranslate` function.
-          className="button"
-          disabled={isLoading} // The button is disabled (`true`) if `isLoading` is true.
+          onClick={handleTranslate}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
-          {/* Conditional rendering: Show spinner and "Translating..." text if loading, otherwise show "Translate" */}
           {isLoading ? (
             <span className="flex items-center justify-center">
-              {/* SVG for a simple spinning loader icon */}
               <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -180,14 +158,12 @@ function App() {
           )}
         </button>
 
-        {/* Error Message Display: Only shows if the `error` state variable has a value */}
         {error && (
           <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm text-center">
             {error}
           </div>
         )}
 
-        {/* Translated Output Section: Only shows if `translatedText` has a value */}
         {translatedText && (
           <div className="mt-6">
             <label htmlFor="translatedText" className="block text-sm font-medium text-gray-700 mb-2">
@@ -196,8 +172,8 @@ function App() {
             <textarea
               id="translatedText"
               className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 resize-y min-h-[120px] cursor-not-allowed"
-              value={translatedText} // The value is controlled by our `translatedText` state.
-              readOnly // Make the textarea read-only, as the user shouldn't edit the translation.
+              value={translatedText}
+              readOnly
               rows="6"
             ></textarea>
           </div>
