@@ -47,11 +47,15 @@ function App() {
   let chatHistory = [];
   chatHistory.push({ role: "user", parts: [{ text: prompt }] });
 
-  const payload = { contents: chatHistory };
-  const apiKey = "";
-  const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
-
   try {
+    const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
+
+    const payload = {
+      text: inputText,
+      sourceLanguage: sourceLanguage,
+      targetLanguage: targetLanguage,
+    };
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
