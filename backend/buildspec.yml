@@ -8,19 +8,13 @@ phases:
       - npm install -g aws-sam-cli # Install SAM CLI
   pre_build:
     commands:
-      - echo "Installing dependencies..."
-      - cd src # Go into the Lambda source directory
-      - npm install # Install Node.js dependencies for your Lambda function
-      - cd .. # Go back to the backend root
+      - echo "Installing Lambda function dependencies..."
+      - cd src && npm install 
+      - echo "Dependencies installed in src directory."
   build:
     commands:
       - echo "Building and packaging the SAM application..."
-      # 'sam build' packages your code and dependencies
       - sam build
-      # 'sam deploy' deploys the application via CloudFormation
-      # --stack-name: A unique name for your CloudFormation stack
-      # --s3-bucket: An S3 bucket where SAM will upload your deployment artifacts
-      # --capabilities CAPABILITY_IAM: Required for SAM to create IAM roles
       - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name TranslatorBackendStack --s3-bucket translatorbucketkh --region us-east-1 --capabilities CAPABILITY_IAM
 artifacts:
   files:
