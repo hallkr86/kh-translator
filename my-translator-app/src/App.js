@@ -90,10 +90,11 @@ function App() {
           </span>
         </h1>
 
-        <div className="mb-6">
+        <div className="enterText">
           <label htmlFor="inputText" className="textLabel">
-            Enter Text: 
+            Enter Text
           </label>
+          <br></br>
           <textarea
             id="inputText"
             className="textBox"
@@ -104,14 +105,16 @@ function App() {
           ></textarea>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <br></br>
+
+        <div className="grid">
           <div>
-            <label htmlFor="sourceLanguage" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sourceLanguage" className="block-text">
               Source Language: 
             </label>
             <select
               id="sourceLanguage"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out bg-white text-gray-800"
+              className="select-source"
               value={sourceLanguage}
               onChange={(e) => setSourceLanguage(e.target.value)}
             >
@@ -123,12 +126,12 @@ function App() {
             </select>
           </div>
           <div>
-            <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="targetLanguage" className="block-text">
               Target Language: 
             </label>
             <select
               id="targetLanguage"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out bg-white text-gray-800"
+              className="select-target"
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
             >
@@ -140,17 +143,19 @@ function App() {
             </select>
           </div>
         </div>
+        
+        <br></br>
 
         <button
           onClick={handleTranslate}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-blue-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="translate-button"
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <span>
+              <svg>
+                <circle className="circle"></circle>
+                <path></path>
               </svg>
               Translating...
             </span>
@@ -160,19 +165,22 @@ function App() {
         </button>
 
         {error && (
-          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm text-center">
+          <div className="error">
             {error}
           </div>
         )}
-
+        
         {translatedText && (
+         
           <div className="mt-6">
-            <label htmlFor="translatedText" className="block text-sm font-medium text-gray-700 mb-2">
-              Translated Text: 
+            <br></br>
+            <label htmlFor="translatedText" className="textLabel">
+              Translated Text
             </label>
+            <br></br>
             <textarea
               id="translatedText"
-              className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 resize-y min-h-[120px] cursor-not-allowed"
+              className="textBox"
               value={translatedText}
               readOnly
               rows="6"

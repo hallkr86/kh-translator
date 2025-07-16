@@ -9,15 +9,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  
+  padding: 1rem;
+  font-family: 'Inter', sans-serif;
   color: black;
 }
 
 .form {
   background-color: antiquewhite;
   border-radius: 30px;
-  opacity: 85%;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  opacity: 95%;
   padding: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.textBox {
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  padding: 5px 5px 5px 5px;
+}
+
+.block-text {
+  padding: 10px 10px 20px 10px;
+}
+
+.select-source {
+  margin: 5px 5px 5px 5px;
+  padding: 2px 2px 2px 2px;
+  border-radius: 5px;
+}
+
+.select-target {
+  margin: 5px 5px 5px 5px;
+  padding: 2px 2px 2px 2px;
+  border-radius: 5px;
+}
+
+button {
+  border-radius: 5px;
+  background-color: navy;
+  color:azure;
+  padding: 5px 10px 5px 10px;
 }
 
 
