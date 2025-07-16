@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Translator Backend with Lambda and API Gateway
+
+Resources:
+  
+  TranslatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: myTranslatorFunction  
+      Handler: index.handler            
+      Runtime: nodejs22.x                
+      CodeUri: src/                      
+      MemorySize: 128                   
+      Timeout: 30                        
+      Architectures:
+        - x86_64
+      Policies:
+        
+        - AWSLambdaBasicExecutionRole
+        # Policy to allow Lambda to call Amazon Translate
+        - Statement:
+            - Effect: Allow
+              Action:
+                - translate:TranslateText
+              Resource: "*" # Allows translation of any text. Be more restrictive if needed.
+      Events:
+        # Defines the API Gateway endpoint that triggers this Lambda function
+        TranslateApi:
+          Type: Api
+          Properties:
+            Path: /translate             
+            Method: post                
+            RestApiId: !Ref TranslatorApi # Refers to the API Gateway defined below
+            # Enable CORS directly in the SAM template for this specific method
+            Cors:
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowMethods: "'OPTIONS,POST'"
+              AllowOrigin: "'*'" # For testing. In production, use your Amplify app's URL: "'https://main.d2n4vekoh5jo7l.amplifyapp.com'"
+              AllowCredentials: false
+
+  # Defines your API Gateway REST API
+  TranslatorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod                  # The stage name (matches your frontend's API URL)
+      DefinitionBody: # 
+        swagger: "2.0"
+        info:
+          title: !Sub "${AWS::StackName}-API"
+        paths:
+          /translate:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                type: "aws_proxy" # Crucial: Enables Lambda Proxy Integration
+                uri: !Sub "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TranslatorFunction.Arn}/invocations"
+                responses: {} # Necessary for proxy integration
+              responses:
+                "200":
+                  description: "200 response"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              # Options method for CORS preflight
+              options:
+                responses:
+                  "200":
+                    description: "200 response"
+                    headers:
+                      Access-Control-Allow-Origin:
+                        type: "string"
+                      Access-Control-Allow-Methods:
+                        type: "string"
+                      Access-Control-Allow-Headers:
+                        type: "string"
+                x-amazon-apigateway-integration:
+                  type: "mock"
+                  requestTemplates:
+                    "application/json": "{\"statusCode\": 200}"
+                  responses:
+                    default:
+                      statusCode: "200"
+                      responseParameters:
+                        method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+                        method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                        method.response.header.Access-Control-Allow-Origin: "'*'" # Or your Amplify URL
+
+Outputs:
+  # Output the API Gateway Invoke URL for easy access
+  ApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage for Translator Function"
+    Value: !Sub "https://${TranslatorApi}.execute-api.${AWS::Region}.amazonaws.com/prod/translate"
