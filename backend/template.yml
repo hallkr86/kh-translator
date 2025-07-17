@@ -33,17 +33,18 @@ Resources:
             Method: post                
             RestApiId: !Ref TranslatorApi # Refers to the API Gateway defined below
             # Enable CORS directly in the SAM template for this specific method
-            Cors:
-              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              AllowMethods: "'OPTIONS,POST'"
-              AllowOrigin: "'*'" # For testing. In production, use your Amplify app's URL: "'https://main.d2n4vekoh5jo7l.amplifyapp.com'"
-              AllowCredentials: false
+            
 
   # Defines your API Gateway REST API
   TranslatorApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: prod                  # The stage name (matches your frontend's API URL)
+      Cors:
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowMethods: "'OPTIONS,POST'"
+              AllowOrigin: "'*'" # For testing. In production, use your Amplify app's URL: "'https://main.d2n4vekoh5jo7l.amplifyapp.com'"
+              AllowCredentials: false
       DefinitionBody: # 
         swagger: "2.0"
         info:
