@@ -4,6 +4,9 @@ A real-time application that translate text to various languages. I used AWS ser
 
 ![Screenshot of App](./translatorapplication.png)
 
+### Deployed Link: 
+https://main.d2n4vekoh5jo7l.amplifyapp.com/
+
 ## Features
 
 - Real-Time Text Translation: Utilizes Amazon Translate for accurate and efficient language translation.
