@@ -40,7 +40,7 @@ function App() {
       // --- IMPORTANT CHANGE START ---
       // This is the URL of your AWS API Gateway endpoint
       // Make sure this matches your deployed API Gateway URL exactly
-      const apiUrl = 'https://p18ssagca5.execute-api.us-east-1.amazonaws.com/prod/translate';
+      const apiUrl = 'https://u29o5lfwvf.execute-api.us-east-1.amazonaws.com/prod/translate';
 
       // This is the payload your AWS Lambda function expects
       const payload = {
